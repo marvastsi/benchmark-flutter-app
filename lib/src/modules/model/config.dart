@@ -6,6 +6,6 @@ class Config {
   final String serverUrl;
   final int specificScenario;
 
-  const Config(this.testLoad, this.mediaUri, this.uploadUri, this.downloadUri, this.serverUrl,
-      this.specificScenario);
+  const Config(this.testLoad, this.mediaUri, this.uploadUri, this.downloadUri,
+      this.serverUrl, this.specificScenario);
 }

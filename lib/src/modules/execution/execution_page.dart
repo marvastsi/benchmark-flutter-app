@@ -1,12 +1,15 @@
 import 'package:benchmark_flutter_app/home_page.dart';
+import 'package:benchmark_flutter_app/src/commons/config_storage.dart';
+import 'package:benchmark_flutter_app/src/modules/execution/executions.dart';
 import 'package:flutter/material.dart';
+
+import '../config/config_page.dart';
 
 class ExecutionPage extends StatelessWidget {
   const ExecutionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Green Benchmark'),
@@ -28,17 +31,21 @@ class ExecutionForm extends StatefulWidget {
 }
 
 class _ExecutionFormState extends State<ExecutionForm> {
-  int _scenario = 1;
+  late int _scenario;
+  String _textLabel = 'Click the button to Start';
+  String _textButton = 'Start';
+  late IExecution testExecution;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const Center(
+        Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
-            child: Text('Click the button to Start'),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
+            child: Text(_textLabel),
           ),
         ),
         const SizedBox(
@@ -48,16 +55,34 @@ class _ExecutionFormState extends State<ExecutionForm> {
           child: SizedBox(
             child: ElevatedButton(
               onPressed: () {
-                setState(() {
-                  _scenario = 1;
+                setState(() async {
+                  final config = await ConfigStorage().getConfig();
+                  testExecution = TestExecution.getInstance(config: config);
+                  _scenario = testExecution.next();
+
+                  if (testExecution.hasNext()) {
+                    _scenario = testExecution.next();
+                    if (!testExecution.isRunning()) {
+                      testExecution.start();
+                    }
+                    _textLabel = 'Test Execution is Running';
+                  } else {
+                    _textLabel = 'Test Execution Finished!';
+                    _textButton = 'Reconfigure';
+                    _scenario = 0;
+                    testExecution.stop();
+                  }
+
                 });
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: navigate(context, _scenario)),
-                );
+                // Apos o build do Widget chamar a função de onPressed()
+                // assim onPressed vai executar de acordo com o que foi configurado
+                // configurar duas funções diferentes para o onPressed
+                if (testExecution.isRunning()) {
+                  navigate(context);
+                }
               },
-              child: const Text('Start'),
+              child: Text(_textButton),
             ),
           ),
         ),
@@ -65,9 +90,27 @@ class _ExecutionFormState extends State<ExecutionForm> {
     );
   }
 
-  WidgetBuilder navigate(BuildContext context, int page) {
-    if (page == 1) {
-      return (context) => const HomePage();
+  void navigate(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: getPageRoute(context, _scenario)),
+    );
+  }
+
+  WidgetBuilder getPageRoute(BuildContext context, int page) {
+    switch (page) {
+      case 0:
+        return (context) => const AppConfigPage();
+      case 1:
+        return (context) => const HomePage();
+      case 2:
+        return (context) => const HomePage();
+      case 3:
+        return (context) => const HomePage();
+      case 4:
+        return (context) => const HomePage();
+      case 5:
+        return (context) => const HomePage();
     }
     throw Exception('No routes found');
   }

@@ -1,42 +1,41 @@
 import 'dart:io';
 
 import 'package:benchmark_flutter_app/home_page.dart';
+import 'package:benchmark_flutter_app/src/modules/download/dowload_client.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
-import 'package:benchmark_flutter_app/src/modules/login/login_client.dart';
-import 'package:benchmark_flutter_app/src/modules/model/login.dart';
+import 'package:benchmark_flutter_app/src/modules/model/download_file.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class DownloadPage extends StatelessWidget {
+  const DownloadPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Download'),
       ),
       body: Container(
         alignment: Alignment.topCenter,
         padding: const EdgeInsets.only(top: 40, right: 20, left: 20),
-        child: const SingleChildScrollView(child: LoginForm()),
+        child: const SingleChildScrollView(child: DownloadForm()),
       ),
     );
   }
 }
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+class DownloadForm extends StatefulWidget {
+  const DownloadForm({super.key});
 
   @override
-  State<LoginForm> createState() => _LoginFormState();
+  State<DownloadForm> createState() => _DownloadFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class _DownloadFormState extends State<DownloadForm> {
   final _formKey = GlobalKey<FormState>();
   final formValidVN = ValueNotifier<bool>(false);
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  Future<Token>? _futureToken;
+  final _fileNameController = TextEditingController();
+  Future<DownloadFile>? _futureResponse;
 
   @override
   void initState() {
@@ -45,14 +44,12 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _fileNameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey created above.
     return Form(
       key: _formKey,
       onChanged: () {
@@ -71,27 +68,10 @@ class _LoginFormState extends State<LoginForm> {
                 return null;
               },
               decoration: const InputDecoration(
-                labelText: 'Username',
-                hintText: 'Username',
+                labelText: 'File',
+                hintText: 'File to Download',
               ),
-              controller: _emailController,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4.0),
-            child: TextFormField(
-              validator: (value) {
-                if (value == null || value.length <= 5) {
-                  return 'Password must be >5 characters';
-                }
-                return null;
-              },
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                hintText: 'Password',
-              ),
-              controller: _passwordController,
+              controller: _fileNameController,
             ),
           ),
           Padding(
@@ -106,9 +86,8 @@ class _LoginFormState extends State<LoginForm> {
                           ? null
                           : () {
                               setState(() {
-                                _futureToken = login(Credentials(
-                                    username: _emailController.text,
-                                    password: _passwordController.text));
+                                _futureResponse = download(
+                                    fileName: _fileNameController.text);
                               });
 
                               sleep(const Duration(seconds: 2));
@@ -121,7 +100,7 @@ class _LoginFormState extends State<LoginForm> {
                                     builder: navigate(context, 1)),
                               );
                             },
-                      child: const Text('Login'),
+                      child: const Text('Download'),
                     ),
                   );
                 }),
@@ -137,9 +116,9 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  FutureBuilder<Token> buildFutureBuilder() {
-    return FutureBuilder<Token>(
-      future: _futureToken,
+  FutureBuilder<DownloadFile> buildFutureBuilder() {
+    return FutureBuilder<DownloadFile>(
+      future: _futureResponse,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Text('${snapshot.data}');

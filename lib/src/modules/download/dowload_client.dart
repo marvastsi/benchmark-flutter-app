@@ -2,27 +2,25 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
+import 'package:benchmark_flutter_app/src/modules/model/download_file.dart';
 import 'package:benchmark_flutter_app/src/modules/model/login.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-Token parseResponse(String responseBody) =>
-    Token.fromJson(jsonDecode(responseBody));
 
-Future<Token> login(Credentials credentials) async {
+DownloadFile parseResponse(String responseBody) =>
+    DownloadFile(jsonDecode(responseBody));
 
-  print(credentials);
-  var url = Uri.parse('http://192.168.100.115:3000/api/login');
+Future<DownloadFile> download({required String fileName}) async {
+
+  print(fileName);
+  var url = Uri.parse('http://192.168.100.115:3000/api/files/download/:name');
   print(url);
 
-  var jsonBody = jsonEncode(credentials);
-  print(jsonBody);
-
-  final response = await http.post(
+  final response = await http.get(
       url,
-      headers: createDefaultHeader(),
-      body: jsonBody
+      headers: createDefaultHeader()
   ).catchError((err) {
     print('Error: $err');
     return Response('', 500, reasonPhrase: 'Client exception: $err');
@@ -39,7 +37,7 @@ Future<Token> login(Credentials credentials) async {
 
 Map<String, String> createDefaultHeader(
     {String authorization = '',
-    String accept = 'application/json',
+    String accept = 'multipart-file',
     String contentType = 'application/json; charset=UTF-8'}) {
   return {
     'Accept': accept,

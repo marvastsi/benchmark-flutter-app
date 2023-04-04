@@ -43,6 +43,7 @@ class _AppConfigFormState extends State<AppConfigForm> {
   final _nScenarioController = TextEditingController();
 
   ScenarioEntry? selectedScenario = ScenarioEntry.none;
+  final ConfigStorage _configStorage = ConfigStorage();
 
   @override
   void initState() {
@@ -186,7 +187,7 @@ class _AppConfigFormState extends State<AppConfigForm> {
                       onPressed: !formValid
                           ? null
                           : () {
-                              saveConfig(Config(
+                        _configStorage.saveConfig(Config(
                                   int.parse(_nExecutionsController.text),
                                   _uploadFileController.text,
                                   _downloadFileController.text,
