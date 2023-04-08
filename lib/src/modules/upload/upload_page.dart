@@ -17,6 +17,8 @@ class UploadPage extends StatelessWidget {
       ),
       body: Container(
         alignment: Alignment.topCenter,
+        width: double.infinity,
+        height: double.infinity,
         padding: const EdgeInsets.only(top: 40, right: 20, left: 20),
         child: const SingleChildScrollView(child: UploadForm()),
       ),
@@ -86,8 +88,9 @@ class _UploadFormState extends State<UploadForm> {
                           ? null
                           : () {
                               setState(() {
-                                _futureResponse =
-                                    upload(fileName: _filePathController.text);
+                                _futureResponse = upload(
+                                    file: File.fromUri(
+                                        Uri.file(_filePathController.text)));
                               });
 
                               sleep(const Duration(seconds: 2));

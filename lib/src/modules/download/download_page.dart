@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:benchmark_flutter_app/home_page.dart';
+import 'package:benchmark_flutter_app/src/commons/permissions.dart';
 import 'package:benchmark_flutter_app/src/modules/download/dowload_client.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
 import 'package:benchmark_flutter_app/src/modules/model/download_file.dart';
@@ -17,7 +18,9 @@ class DownloadPage extends StatelessWidget {
       ),
       body: Container(
         alignment: Alignment.topCenter,
-        padding: const EdgeInsets.only(top: 40, right: 20, left: 20),
+        width: double.infinity,
+        height: double.infinity,
+        padding: const EdgeInsets.only(top: 40, right: 30, left: 30),
         child: const SingleChildScrollView(child: DownloadForm()),
       ),
     );
@@ -40,6 +43,7 @@ class _DownloadFormState extends State<DownloadForm> {
   @override
   void initState() {
     super.initState();
+    requestPermission();
   }
 
   @override
@@ -123,8 +127,13 @@ class _DownloadFormState extends State<DownloadForm> {
         if (snapshot.hasData) {
           return Text('${snapshot.data}');
         } else if (snapshot.hasError) {
-          HttpException error = snapshot.error! as HttpException;
-          return Text('${error.code}: ${error.message}');
+          Exception error = snapshot.error! as Exception;
+          var str = 'error: ${error.toString()}';
+          if (error is HttpException) {
+            var str = '${error.code}: ${error.message}';
+            return Text(str);
+          }
+          return Text(str);
         }
 
         return const CircularProgressIndicator();

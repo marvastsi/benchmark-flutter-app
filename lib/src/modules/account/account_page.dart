@@ -20,7 +20,7 @@ class AccountPage extends StatelessWidget {
         alignment: Alignment.topCenter,
         width: double.infinity,
         height: double.infinity,
-        padding: const EdgeInsets.only(top: 40, right: 20, left: 20),
+        padding: const EdgeInsets.only(top: 10, right: 30, left: 30),
         child: const SingleChildScrollView(child: AccountForm()),
       ),
     );
@@ -48,6 +48,8 @@ class _AccountFormState extends State<AccountForm> {
   Future<Account>? _futureResponse;
   CountryCodeEntry? selectedCode = CountryCodeEntry.none;
   final ConfigStorage _configStorage = ConfigStorage();
+  bool active = false;
+  bool notifications = false;
 
   @override
   void initState() {
@@ -81,7 +83,7 @@ class _AccountFormState extends State<AccountForm> {
         formValidVN.value = _formKey.currentState?.validate() ?? false;
       },
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -129,6 +131,31 @@ class _AccountFormState extends State<AccountForm> {
             ),
           ),
           Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 10.0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  child: DropdownMenu<CountryCodeEntry>(
+                    inputDecorationTheme: const InputDecorationTheme(
+                        border: UnderlineInputBorder()),
+                    initialSelection: CountryCodeEntry.none,
+                    controller: _phoneCountryCodeController,
+                    dropdownMenuEntries: scenarioEntries,
+                    onSelected: (CountryCodeEntry? scenario) {
+                      setState(() {
+                        selectedCode = scenario;
+                      });
+                    },
+                  ),
+                )
+              ],
+            ),
+          ),
+          Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: TextFormField(
               keyboardType: TextInputType.number,
@@ -146,6 +173,61 @@ class _AccountFormState extends State<AccountForm> {
                 hintText: 'Phone Number',
               ),
               controller: _phoneNumberController,
+            ),
+          ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(vertical: 4.0),
+          //   child: SwitchListTile(
+          //       contentPadding: EdgeInsets.zero, //switch at right side of label
+          //       value: active,
+          //       onChanged: (bool value) {
+          //         setState(() {
+          //           active = value;
+          //         });
+          //       },
+          //       title: const Text("Active")),
+          // ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(vertical: 4.0),
+          //   child: CheckboxListTile(
+          //     contentPadding: EdgeInsets.zero,
+          //     title: const Text('Notifications'),
+          //     value: notifications,
+          //     onChanged: (bool? value) {
+          //       setState(() {
+          //         notifications = value!;
+          //       });
+          //     },
+          //   ),
+          // ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Row(
+              children: <Widget>[
+                const Expanded(flex: 0, child: Text('Active')),
+                Switch(
+                  //switch at right side of label
+                  value: active,
+                  onChanged: (bool value) {
+                    setState(() {
+                      active = value;
+                    });
+                  },
+                ),
+                const Expanded(
+                  flex: 2,
+                  child: Text(''),
+                ),
+                Checkbox(
+                  value: notifications,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      notifications = value!;
+                    });
+                  },
+                ),
+                const Expanded(flex: 0, child: Text('Notifications')),
+              ],
             ),
           ),
           Padding(
@@ -180,26 +262,6 @@ class _AccountFormState extends State<AccountForm> {
                 hintText: 'Password',
               ),
               controller: _passwordController,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                DropdownMenu<CountryCodeEntry>(
-                  inputDecorationTheme:
-                      const InputDecorationTheme(border: InputBorder.none),
-                  initialSelection: CountryCodeEntry.none,
-                  controller: _phoneCountryCodeController,
-                  dropdownMenuEntries: scenarioEntries,
-                  onSelected: (CountryCodeEntry? scenario) {
-                    setState(() {
-                      selectedCode = scenario;
-                    });
-                  },
-                ),
-              ],
             ),
           ),
           Padding(

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:benchmark_flutter_app/src/commons/http_response_extensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-
 
 List<File> parseFiles(String responseBody) {
   final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
@@ -12,10 +12,10 @@ List<File> parseFiles(String responseBody) {
 }
 
 Future<List<File>> fetchFiles(http.Client client) async {
-  final response = await client
-      .get(Uri.parse('http://192.168.100.115:3000/api/files/list'));
+  final response =
+      await client.get(Uri.parse('http://192.168.100.115:3000/api/files/list'));
 
-  if (response.statusCode == 200) {
+  if (response.isSuccessful) {
     return compute(parseFiles, response.body);
   } else {
     throw Exception('Failed to load files list');

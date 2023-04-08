@@ -34,12 +34,28 @@ class _MediaFormState extends State<MediaForm> {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
+        const Padding(
           padding: EdgeInsets.symmetric(vertical: 6.0),
-          child: Text('Media File'),
+          child: Row(
+            children: <Widget>[
+              Expanded(flex: 0, child: Text('Media File')),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          child: Row(
+            children: <Widget>[
+              Container(
+                color: Colors.blueGrey,
+                width: 350.0,
+                height: 550.0,
+              ),
+            ],
+          ),
         ),
       ],
     );

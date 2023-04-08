@@ -1,6 +1,10 @@
-import 'package:benchmark_flutter_app/home_page.dart';
 import 'package:benchmark_flutter_app/src/commons/config_storage.dart';
+import 'package:benchmark_flutter_app/src/modules/account/account_page.dart';
+import 'package:benchmark_flutter_app/src/modules/download/download_page.dart';
 import 'package:benchmark_flutter_app/src/modules/execution/executions.dart';
+import 'package:benchmark_flutter_app/src/modules/login/login_page.dart';
+import 'package:benchmark_flutter_app/src/modules/media/media_page.dart';
+import 'package:benchmark_flutter_app/src/modules/upload/upload_page.dart';
 import 'package:flutter/material.dart';
 
 import '../config/config_page.dart';
@@ -16,6 +20,8 @@ class ExecutionPage extends StatelessWidget {
       ),
       body: Container(
         alignment: Alignment.topCenter,
+        width: double.infinity,
+        height: double.infinity,
         padding: const EdgeInsets.only(top: 40, right: 20, left: 20),
         child: const SingleChildScrollView(child: ExecutionForm()),
       ),
@@ -72,7 +78,6 @@ class _ExecutionFormState extends State<ExecutionForm> {
                     _scenario = 0;
                     testExecution.stop();
                   }
-
                 });
 
                 // Apos o build do Widget chamar a função de onPressed()
@@ -102,15 +107,15 @@ class _ExecutionFormState extends State<ExecutionForm> {
       case 0:
         return (context) => const AppConfigPage();
       case 1:
-        return (context) => const HomePage();
+        return (context) => const LoginPage();
       case 2:
-        return (context) => const HomePage();
+        return (context) => const AccountPage();
       case 3:
-        return (context) => const HomePage();
+        return (context) => const DownloadPage();
       case 4:
-        return (context) => const HomePage();
+        return (context) => const UploadPage();
       case 5:
-        return (context) => const HomePage();
+        return (context) => const MediaPage();
     }
     throw Exception('No routes found');
   }

@@ -1,7 +1,9 @@
 import 'package:benchmark_flutter_app/src/commons/config_storage.dart';
+import 'package:benchmark_flutter_app/src/commons/permissions.dart';
 import 'package:benchmark_flutter_app/src/modules/execution/execution_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../model/config.dart';
 
@@ -18,7 +20,7 @@ class AppConfigPage extends StatelessWidget {
         alignment: Alignment.topCenter,
         width: double.infinity,
         height: double.infinity,
-        padding: const EdgeInsets.only(top: 40, right: 20, left: 20),
+        padding: const EdgeInsets.only(top: 40, right: 30, left: 30),
         child: const SingleChildScrollView(child: AppConfigForm()),
       ),
     );
@@ -47,6 +49,7 @@ class _AppConfigFormState extends State<AppConfigForm> {
 
   @override
   void initState() {
+    requestPermission();
     super.initState();
   }
 
@@ -76,7 +79,7 @@ class _AppConfigFormState extends State<AppConfigForm> {
         formValidVN.value = _formKey.currentState?.validate() ?? false;
       },
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -86,7 +89,7 @@ class _AppConfigFormState extends State<AppConfigForm> {
                 FilteringTextInputFormatter.digitsOnly
               ],
               validator: (value) {
-                if (value == null || int.parse(value) <= 10) {
+                if (value == null || int.parse(value) < 10) {
                   return 'Load must be >= 10';
                 }
                 return null;
@@ -154,19 +157,22 @@ class _AppConfigFormState extends State<AppConfigForm> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                DropdownMenu<ScenarioEntry>(
-                  inputDecorationTheme:
-                      const InputDecorationTheme(border: InputBorder.none),
-                  initialSelection: ScenarioEntry.none,
-                  controller: _nScenarioController,
-                  dropdownMenuEntries: scenarioEntries,
-                  onSelected: (ScenarioEntry? scenario) {
-                    setState(() {
-                      selectedScenario = scenario;
-                    });
-                  },
+                Expanded(
+                  child: DropdownMenu<ScenarioEntry>(
+                    inputDecorationTheme: const InputDecorationTheme(
+                        border: UnderlineInputBorder()),
+                    initialSelection: ScenarioEntry.none,
+                    controller: _nScenarioController,
+                    dropdownMenuEntries: scenarioEntries,
+                    onSelected: (ScenarioEntry? scenario) {
+                      setState(() {
+                        selectedScenario = scenario;
+                      });
+                    },
+                  ),
                 ),
               ],
             ),
@@ -187,7 +193,7 @@ class _AppConfigFormState extends State<AppConfigForm> {
                       onPressed: !formValid
                           ? null
                           : () {
-                        _configStorage.saveConfig(Config(
+                              _configStorage.saveConfig(Config(
                                   int.parse(_nExecutionsController.text),
                                   _uploadFileController.text,
                                   _downloadFileController.text,

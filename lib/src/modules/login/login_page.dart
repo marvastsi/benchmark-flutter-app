@@ -17,7 +17,9 @@ class LoginPage extends StatelessWidget {
       ),
       body: Container(
         alignment: Alignment.topCenter,
-        padding: const EdgeInsets.only(top: 40, right: 20, left: 20),
+        width: double.infinity,
+        height: double.infinity,
+        padding: const EdgeInsets.only(top: 40, right: 30, left: 30),
         child: const SingleChildScrollView(child: LoginForm()),
       ),
     );

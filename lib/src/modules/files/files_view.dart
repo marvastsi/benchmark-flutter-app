@@ -68,10 +68,11 @@ class FilesList extends StatelessWidget {
           itemBuilder: (BuildContext context, int index) {
             return Card(
               color: Colors.greenAccent,
-              child: Center(child: Text('${files[index].url} - ${files[index].url}'),),
+              child: Center(
+                child: Text('${files[index].url} - ${files[index].url}'),
+              ),
             );
-          }
-      ),
+          }),
     );
   }
 }
