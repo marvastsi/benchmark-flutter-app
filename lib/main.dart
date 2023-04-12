@@ -1,11 +1,5 @@
-import 'package:benchmark_flutter_app/src/modules/account/account_page.dart';
-import 'package:benchmark_flutter_app/src/modules/config/config_page.dart';
-import 'package:benchmark_flutter_app/src/modules/download/download_page.dart';
-import 'package:benchmark_flutter_app/src/modules/login/login_page.dart';
-import 'package:benchmark_flutter_app/src/modules/media/media_page.dart';
-import 'package:benchmark_flutter_app/src/modules/upload/upload_page.dart';
+import 'package:benchmark_flutter_app/src/modules/media/media_player_page.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 void main() => runApp(const MyApp());
 
@@ -20,11 +14,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.teal,
       ),
       // home: const AppConfigPage(),
-      // home: const LoginPage(),
-      // home: const AccountPage(),
-      // home: const DownloadPage(),
-      home: const UploadPage(),
-      // home: const MediaPage(),
+      home: const MediaPlayerPage(),
     );
   }
 }
@@ -56,9 +46,4 @@ class MainPage extends StatelessWidget {
       ),
     );
   }
-}
-
-void _requestPermission() {
-  Permission.storage.request();
-  Permission.manageExternalStorage.request();
 }

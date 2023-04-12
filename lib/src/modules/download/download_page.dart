@@ -13,6 +13,7 @@ class DownloadPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const ValueKey<String>('download_page'),
       appBar: AppBar(
         title: const Text('Download'),
       ),

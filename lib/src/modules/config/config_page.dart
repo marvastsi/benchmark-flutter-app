@@ -13,6 +13,7 @@ class AppConfigPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const ValueKey<String>('config_page'),
       appBar: AppBar(
         title: const Text('App Config'),
       ),

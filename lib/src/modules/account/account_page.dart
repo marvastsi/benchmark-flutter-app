@@ -1,7 +1,6 @@
 import 'package:benchmark_flutter_app/home_page.dart';
 import 'package:benchmark_flutter_app/src/commons/config_storage.dart';
 import 'package:benchmark_flutter_app/src/modules/account/account_client.dart';
-import 'package:benchmark_flutter_app/src/modules/execution/execution_page.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
 import 'package:benchmark_flutter_app/src/modules/model/account.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +12,7 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const ValueKey<String>('account_page'),
       appBar: AppBar(
         title: const Text('Account'),
       ),
@@ -175,31 +175,6 @@ class _AccountFormState extends State<AccountForm> {
               controller: _phoneNumberController,
             ),
           ),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(vertical: 4.0),
-          //   child: SwitchListTile(
-          //       contentPadding: EdgeInsets.zero, //switch at right side of label
-          //       value: active,
-          //       onChanged: (bool value) {
-          //         setState(() {
-          //           active = value;
-          //         });
-          //       },
-          //       title: const Text("Active")),
-          // ),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(vertical: 4.0),
-          //   child: CheckboxListTile(
-          //     contentPadding: EdgeInsets.zero,
-          //     title: const Text('Notifications'),
-          //     value: notifications,
-          //     onChanged: (bool? value) {
-          //       setState(() {
-          //         notifications = value!;
-          //       });
-          //     },
-          //   ),
-          // ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Row(

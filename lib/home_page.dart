@@ -11,6 +11,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const ValueKey<String>('home_page'),
       appBar: AppBar(
         title: const Text('Green Benchmark'),
       ),

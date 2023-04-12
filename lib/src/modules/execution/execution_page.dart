@@ -3,7 +3,7 @@ import 'package:benchmark_flutter_app/src/modules/account/account_page.dart';
 import 'package:benchmark_flutter_app/src/modules/download/download_page.dart';
 import 'package:benchmark_flutter_app/src/modules/execution/executions.dart';
 import 'package:benchmark_flutter_app/src/modules/login/login_page.dart';
-import 'package:benchmark_flutter_app/src/modules/media/media_page.dart';
+import 'package:benchmark_flutter_app/src/modules/media/media_player_page.dart';
 import 'package:benchmark_flutter_app/src/modules/upload/upload_page.dart';
 import 'package:flutter/material.dart';
 
@@ -115,7 +115,7 @@ class _ExecutionFormState extends State<ExecutionForm> {
       case 4:
         return (context) => const UploadPage();
       case 5:
-        return (context) => const MediaPage();
+        return (context) => const MediaPlayerPage();
     }
     throw Exception('No routes found');
   }

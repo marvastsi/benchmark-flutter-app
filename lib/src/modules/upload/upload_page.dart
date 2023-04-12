@@ -12,6 +12,7 @@ class UploadPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const ValueKey<String>('upload_page'),
       appBar: AppBar(
         title: const Text('Upload'),
       ),
