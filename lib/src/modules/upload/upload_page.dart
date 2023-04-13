@@ -1,13 +1,16 @@
 import 'dart:io';
 
-import 'package:benchmark_flutter_app/home_page.dart';
+import 'package:benchmark_flutter_app/src/commons/file_extensions.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
+import 'package:benchmark_flutter_app/src/modules/model/config.dart';
 import 'package:benchmark_flutter_app/src/modules/model/upload_file.dart';
 import 'package:benchmark_flutter_app/src/modules/upload/upload_client.dart';
 import 'package:flutter/material.dart';
 
 class UploadPage extends StatelessWidget {
-  const UploadPage({super.key});
+  const UploadPage({super.key, required this.config});
+
+  final Config config;
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +24,19 @@ class UploadPage extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         padding: const EdgeInsets.only(top: 40, right: 20, left: 20),
-        child: const SingleChildScrollView(child: UploadForm()),
+        child: SingleChildScrollView(
+            child: UploadForm(
+                baseUrl: config.serverUrl, uploadUri: config.uploadUri)),
       ),
     );
   }
 }
 
 class UploadForm extends StatefulWidget {
-  const UploadForm({super.key});
+  const UploadForm({super.key, required this.baseUrl, required this.uploadUri});
+
+  final String baseUrl;
+  final String uploadUri;
 
   @override
   State<UploadForm> createState() => _UploadFormState();
@@ -39,9 +47,28 @@ class _UploadFormState extends State<UploadForm> {
   final formValidVN = ValueNotifier<bool>(false);
   final _filePathController = TextEditingController();
   Future<UploadFile>? _futureResponse;
+  late Function(BuildContext) btnPressed;
 
   @override
   void initState() {
+    setState(() {
+      var file = File.fromUri(Uri.file(widget.uploadUri));
+      _filePathController.text = file.name;
+
+      btnPressed = (ctx) {
+        setState(() {
+          _futureResponse =
+              UploadClient(baseUrl: widget.baseUrl).upload(file: file);
+        });
+
+        _showSuccessMessage();
+        Future.delayed(
+            const Duration(seconds: 2), () => Navigator.pop(context));
+      };
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
+
     super.initState();
   }
 
@@ -85,25 +112,7 @@ class _UploadFormState extends State<UploadForm> {
                   return SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: !formValid
-                          ? null
-                          : () {
-                              setState(() {
-                                _futureResponse = upload(
-                                    file: File.fromUri(
-                                        Uri.file(_filePathController.text)));
-                              });
-
-                              sleep(const Duration(seconds: 2));
-
-                              showSuccessMessage();
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: navigate(context, 1)),
-                              );
-                            },
+                      onPressed: !formValid ? null : btnPressed(context),
                       child: const Text('Upload'),
                     ),
                   );
@@ -114,13 +123,13 @@ class _UploadFormState extends State<UploadForm> {
     );
   }
 
-  void showSuccessMessage() async {
+  void _showSuccessMessage() async {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: buildFutureBuilder()),
+      SnackBar(content: _buildFutureBuilder()),
     );
   }
 
-  FutureBuilder<UploadFile> buildFutureBuilder() {
+  FutureBuilder<UploadFile> _buildFutureBuilder() {
     return FutureBuilder<UploadFile>(
       future: _futureResponse,
       builder: (context, snapshot) {
@@ -134,12 +143,5 @@ class _UploadFormState extends State<UploadForm> {
         return const CircularProgressIndicator();
       },
     );
-  }
-
-  WidgetBuilder navigate(BuildContext context, int page) {
-    if (page == 1) {
-      return (context) => const HomePage();
-    }
-    throw Exception('No routes found');
   }
 }

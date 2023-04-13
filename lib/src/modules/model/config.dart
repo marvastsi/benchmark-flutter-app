@@ -8,4 +8,9 @@ class Config {
 
   const Config(this.testLoad, this.mediaUri, this.uploadUri, this.downloadUri,
       this.serverUrl, this.specificScenario);
+
+  @override
+  String toString() {
+    return 'Config{testLoad: $testLoad, mediaUri: $mediaUri, uploadUri: $uploadUri, downloadUri: $downloadUri, serverUrl: $serverUrl, specificScenario: $specificScenario}';
+  }
 }

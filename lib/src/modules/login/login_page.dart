@@ -1,13 +1,13 @@
-import 'dart:io';
-
-import 'package:benchmark_flutter_app/home_page.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
 import 'package:benchmark_flutter_app/src/modules/login/login_client.dart';
+import 'package:benchmark_flutter_app/src/modules/model/config.dart';
 import 'package:benchmark_flutter_app/src/modules/model/login.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key, required this.config});
+
+  final Config config;
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +21,17 @@ class LoginPage extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         padding: const EdgeInsets.only(top: 40, right: 30, left: 30),
-        child: const SingleChildScrollView(child: LoginForm()),
+        child:
+            SingleChildScrollView(child: LoginForm(baseUrl: config.serverUrl)),
       ),
     );
   }
 }
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+  const LoginForm({super.key, required this.baseUrl});
+
+  final String baseUrl;
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -37,25 +40,45 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final formValidVN = ValueNotifier<bool>(false);
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  Future<Token>? _futureToken;
+  Future<Token>? _futureResponse;
+  late Function(BuildContext) btnPressed;
 
   @override
   void initState() {
+    setState(() {
+      _usernameController.text = 'greenbenchmark';
+      _passwordController.text = 'greenbenchmark';
+
+      btnPressed = (ctx) {
+        setState(() {
+          _futureResponse = LoginClient(baseUrl: widget.baseUrl).login(
+              Credentials(
+                  username: _usernameController.text,
+                  password: _passwordController.text));
+        });
+
+        // sleep(const Duration(seconds: 2));
+        _showSuccessMessage();
+        Future.delayed(const Duration(seconds: 2), () => Navigator.pop(context));
+      };
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
+
     super.initState();
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey created above.
     return Form(
       key: _formKey,
       onChanged: () {
@@ -77,15 +100,15 @@ class _LoginFormState extends State<LoginForm> {
                 labelText: 'Username',
                 hintText: 'Username',
               ),
-              controller: _emailController,
+              controller: _usernameController,
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4.0),
             child: TextFormField(
               validator: (value) {
-                if (value == null || value.length <= 5) {
-                  return 'Password must be >5 characters';
+                if (value == null || value.isEmpty) {
+                  return 'Password is required';
                 }
                 return null;
               },
@@ -105,25 +128,7 @@ class _LoginFormState extends State<LoginForm> {
                   return SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: !formValid
-                          ? null
-                          : () {
-                              setState(() {
-                                _futureToken = login(Credentials(
-                                    username: _emailController.text,
-                                    password: _passwordController.text));
-                              });
-
-                              sleep(const Duration(seconds: 2));
-
-                              showSuccessMessage();
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: navigate(context, 1)),
-                              );
-                            },
+                      onPressed: !formValid ? null : btnPressed(context),
                       child: const Text('Login'),
                     ),
                   );
@@ -134,15 +139,15 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  void showSuccessMessage() async {
+  void _showSuccessMessage() async {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: buildFutureBuilder()),
+      SnackBar(content: _buildFutureBuilder()),
     );
   }
 
-  FutureBuilder<Token> buildFutureBuilder() {
+  FutureBuilder<Token> _buildFutureBuilder() {
     return FutureBuilder<Token>(
-      future: _futureToken,
+      future: _futureResponse,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Text('${snapshot.data}');
@@ -154,12 +159,5 @@ class _LoginFormState extends State<LoginForm> {
         return const CircularProgressIndicator();
       },
     );
-  }
-
-  WidgetBuilder navigate(BuildContext context, int page) {
-    if (page == 1) {
-      return (context) => const HomePage();
-    }
-    throw Exception('No routes found');
   }
 }

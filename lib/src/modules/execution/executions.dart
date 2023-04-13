@@ -58,8 +58,9 @@ class RandomList {
   List<int> create(int length) {
     const int first = 1;
     const int last = 5;
-
-    return List.generate(length, (_) => _rand(first, last));
+    var list = List.generate(length, (_) => _rand(first, last));
+    print('>> list: $list');
+    return list;
   }
 
   int _rand(int first, int last) {

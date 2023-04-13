@@ -4,6 +4,7 @@ import 'package:benchmark_flutter_app/src/modules/download/download_page.dart';
 import 'package:benchmark_flutter_app/src/modules/execution/executions.dart';
 import 'package:benchmark_flutter_app/src/modules/login/login_page.dart';
 import 'package:benchmark_flutter_app/src/modules/media/media_player_page.dart';
+import 'package:benchmark_flutter_app/src/modules/model/config.dart';
 import 'package:benchmark_flutter_app/src/modules/upload/upload_page.dart';
 import 'package:flutter/material.dart';
 
@@ -41,6 +42,45 @@ class _ExecutionFormState extends State<ExecutionForm> {
   String _textLabel = 'Click the button to Start';
   String _textButton = 'Start';
   late IExecution testExecution;
+  late Function(BuildContext) btnPressed;
+  late Config _config;
+
+  @override
+  void initState() {
+    ConfigStorage().getConfig().then((config) {
+      setState(() {
+        _config = config;
+        testExecution = TestExecution.getInstance(config: _config);
+
+        if (testExecution.hasNext()) {
+          _scenario = testExecution.next();
+          if (testExecution.isRunning()) {
+            _textLabel = 'Test Execution is Running';
+          }
+          btnPressed = (ctx) {
+            if (!testExecution.isRunning()) {
+              testExecution.start();
+            }
+
+            _executeScenario(ctx);
+          };
+        } else {
+          _textLabel = 'Test Execution Finished!';
+          _textButton = 'Reconfigure';
+          _scenario = 0;
+          testExecution.stop();
+          btnPressed = (ctx) {
+            _navigate(ctx);
+          };
+        }
+
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _executeScenario(context));
+      });
+    });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,31 +101,7 @@ class _ExecutionFormState extends State<ExecutionForm> {
           child: SizedBox(
             child: ElevatedButton(
               onPressed: () {
-                setState(() async {
-                  final config = await ConfigStorage().getConfig();
-                  testExecution = TestExecution.getInstance(config: config);
-                  _scenario = testExecution.next();
-
-                  if (testExecution.hasNext()) {
-                    _scenario = testExecution.next();
-                    if (!testExecution.isRunning()) {
-                      testExecution.start();
-                    }
-                    _textLabel = 'Test Execution is Running';
-                  } else {
-                    _textLabel = 'Test Execution Finished!';
-                    _textButton = 'Reconfigure';
-                    _scenario = 0;
-                    testExecution.stop();
-                  }
-                });
-
-                // Apos o build do Widget chamar a função de onPressed()
-                // assim onPressed vai executar de acordo com o que foi configurado
-                // configurar duas funções diferentes para o onPressed
-                if (testExecution.isRunning()) {
-                  navigate(context);
-                }
+                btnPressed(context);
               },
               child: Text(_textButton),
             ),
@@ -95,27 +111,33 @@ class _ExecutionFormState extends State<ExecutionForm> {
     );
   }
 
-  void navigate(BuildContext context) {
+  void _executeScenario(BuildContext context) {
+    if (testExecution.isRunning()) {
+      Future.delayed(const Duration(seconds: 2), () => _navigate(context));
+    }
+  }
+
+  void _navigate(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: getPageRoute(context, _scenario)),
+      MaterialPageRoute(builder: _getPageRoute(context, _scenario)),
     );
   }
 
-  WidgetBuilder getPageRoute(BuildContext context, int page) {
+  WidgetBuilder _getPageRoute(BuildContext context, int page) {
     switch (page) {
       case 0:
         return (context) => const AppConfigPage();
       case 1:
-        return (context) => const LoginPage();
+        return (context) => LoginPage(config: _config);
       case 2:
-        return (context) => const AccountPage();
+        return (context) => AccountPage(config: _config);
       case 3:
-        return (context) => const DownloadPage();
+        return (context) => DownloadPage(config: _config);
       case 4:
-        return (context) => const UploadPage();
+        return (context) => UploadPage(config: _config);
       case 5:
-        return (context) => const MediaPlayerPage();
+        return (context) => MediaPlayerPage(config: _config);
     }
     throw Exception('No routes found');
   }

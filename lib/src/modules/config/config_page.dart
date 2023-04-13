@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:benchmark_flutter_app/src/commons/config_storage.dart';
+import 'package:benchmark_flutter_app/src/commons/file_extensions.dart';
 import 'package:benchmark_flutter_app/src/commons/permissions.dart';
 import 'package:benchmark_flutter_app/src/modules/execution/execution_page.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../model/config.dart';
 
@@ -47,6 +50,8 @@ class _AppConfigFormState extends State<AppConfigForm> {
 
   ScenarioEntry? selectedScenario = ScenarioEntry.none;
   final ConfigStorage _configStorage = ConfigStorage();
+  late String _mediaPath;
+  late String _uploadPath;
 
   @override
   void initState() {
@@ -90,7 +95,7 @@ class _AppConfigFormState extends State<AppConfigForm> {
                 FilteringTextInputFormatter.digitsOnly
               ],
               validator: (value) {
-                if (value == null || int.parse(value) < 10) {
+                if (value == null || value.isEmpty || int.parse(value) < 10) {
                   return 'Load must be >= 10';
                 }
                 return null;
@@ -104,22 +109,32 @@ class _AppConfigFormState extends State<AppConfigForm> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: FileEntryRow(
+            child: _FileEntryRow(
               validationMsg: 'Media file is required',
               label: 'Media File',
               hint: 'Media File',
               controller: _mediaFileController,
-              onPressed: () {},
+              onPressed: () async {
+                _mediaPath = (await _pickFile(FileType.video))!;
+                setState(() {
+                  _mediaFileController.text = File(_mediaPath).name;
+                });
+              },
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: FileEntryRow(
+            child: _FileEntryRow(
               validationMsg: 'Upload file is required',
               label: 'File to Upload',
               hint: 'File to Upload',
               controller: _uploadFileController,
-              onPressed: () {},
+              onPressed: () async {
+                _uploadPath = (await _pickFile(FileType.any))!;
+                setState(() {
+                  _uploadFileController.text = File(_uploadPath).name;
+                });
+              },
             ),
           ),
           Padding(
@@ -194,13 +209,15 @@ class _AppConfigFormState extends State<AppConfigForm> {
                       onPressed: !formValid
                           ? null
                           : () {
-                              _configStorage.saveConfig(Config(
+                              Config config = Config(
                                   int.parse(_nExecutionsController.text),
-                                  _uploadFileController.text,
+                                  _mediaPath,
+                                  _uploadPath,
                                   _downloadFileController.text,
                                   _serverUrlController.text,
-                                  _mediaFileController.text,
-                                  selectedScenario!.scenario));
+                                  selectedScenario!.scenario);
+                              print(config);
+                              _configStorage.saveConfig(config);
 
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -209,7 +226,7 @@ class _AppConfigFormState extends State<AppConfigForm> {
 
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: navigate(context)),
+                                MaterialPageRoute(builder: _navigate(context)),
                               );
                             },
                       child: const Text('Save Config'),
@@ -222,15 +239,23 @@ class _AppConfigFormState extends State<AppConfigForm> {
     );
   }
 
-  WidgetBuilder navigate(BuildContext context) {
+  WidgetBuilder _navigate(BuildContext context) {
     return (context) => const ExecutionPage();
+  }
+
+  Future<String?> _pickFile(FileType type) async {
+    final result =
+        await FilePicker.platform.pickFiles(type: type, allowMultiple: false);
+
+    if (result == null) return null;
+
+    return result.files.first.path;
   }
 }
 
-class FileEntryRow extends StatelessWidget {
-  const FileEntryRow(
-      {super.key,
-      this.label,
+class _FileEntryRow extends StatelessWidget {
+  const _FileEntryRow(
+      {this.label,
       this.hint,
       this.validationMsg,
       this.controller,

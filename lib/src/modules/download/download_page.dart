@@ -1,14 +1,13 @@
-import 'dart:io';
-
-import 'package:benchmark_flutter_app/home_page.dart';
-import 'package:benchmark_flutter_app/src/commons/permissions.dart';
-import 'package:benchmark_flutter_app/src/modules/download/dowload_client.dart';
+import 'package:benchmark_flutter_app/src/modules/download/download_client.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
+import 'package:benchmark_flutter_app/src/modules/model/config.dart';
 import 'package:benchmark_flutter_app/src/modules/model/download_file.dart';
 import 'package:flutter/material.dart';
 
 class DownloadPage extends StatelessWidget {
-  const DownloadPage({super.key});
+  const DownloadPage({super.key, required this.config});
+
+  final Config config;
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +21,20 @@ class DownloadPage extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         padding: const EdgeInsets.only(top: 40, right: 30, left: 30),
-        child: const SingleChildScrollView(child: DownloadForm()),
+        child: SingleChildScrollView(
+            child: DownloadForm(
+                baseUrl: config.serverUrl, downloadUri: config.downloadUri)),
       ),
     );
   }
 }
 
 class DownloadForm extends StatefulWidget {
-  const DownloadForm({super.key});
+  const DownloadForm(
+      {super.key, required this.baseUrl, required this.downloadUri});
+
+  final String baseUrl;
+  final String downloadUri;
 
   @override
   State<DownloadForm> createState() => _DownloadFormState();
@@ -40,11 +45,28 @@ class _DownloadFormState extends State<DownloadForm> {
   final formValidVN = ValueNotifier<bool>(false);
   final _fileNameController = TextEditingController();
   Future<DownloadFile>? _futureResponse;
+  late Function(BuildContext) btnPressed;
 
   @override
   void initState() {
+    setState(() {
+      _fileNameController.text = widget.downloadUri;
+
+      btnPressed = (ctx) {
+        setState(() {
+          _futureResponse = DownloadClient(baseUrl: widget.baseUrl)
+              .download(fileName: _fileNameController.text);
+        });
+
+        _showSuccessMessage();
+        Future.delayed(
+            const Duration(seconds: 2), () => Navigator.pop(context));
+      };
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
+
     super.initState();
-    requestPermission();
   }
 
   @override
@@ -87,24 +109,7 @@ class _DownloadFormState extends State<DownloadForm> {
                   return SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: !formValid
-                          ? null
-                          : () {
-                              setState(() {
-                                _futureResponse = download(
-                                    fileName: _fileNameController.text);
-                              });
-
-                              sleep(const Duration(seconds: 2));
-
-                              showSuccessMessage();
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: navigate(context, 1)),
-                              );
-                            },
+                      onPressed: !formValid ? null : btnPressed(context),
                       child: const Text('Download'),
                     ),
                   );
@@ -115,13 +120,13 @@ class _DownloadFormState extends State<DownloadForm> {
     );
   }
 
-  void showSuccessMessage() async {
+  void _showSuccessMessage() async {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: buildFutureBuilder()),
+      SnackBar(content: _buildFutureBuilder()),
     );
   }
 
-  FutureBuilder<DownloadFile> buildFutureBuilder() {
+  FutureBuilder<DownloadFile> _buildFutureBuilder() {
     return FutureBuilder<DownloadFile>(
       future: _futureResponse,
       builder: (context, snapshot) {
@@ -140,12 +145,5 @@ class _DownloadFormState extends State<DownloadForm> {
         return const CircularProgressIndicator();
       },
     );
-  }
-
-  WidgetBuilder navigate(BuildContext context, int page) {
-    if (page == 1) {
-      return (context) => const HomePage();
-    }
-    throw Exception('No routes found');
   }
 }

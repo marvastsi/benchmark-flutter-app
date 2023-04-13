@@ -8,41 +8,47 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-Account parseResponse(String responseBody) =>
-    Account.fromJson(jsonDecode(responseBody));
+class AccountClient {
+  const AccountClient({required this.baseUrl});
 
-Future<Account> saveAccount(Account account) async {
-  print(account);
-  var url = Uri.parse('http://192.168.100.115:3000/api/accounts');
-  print(url);
+  final String baseUrl;
 
-  var jsonBody = jsonEncode(account);
-  print(jsonBody);
+  Account _parseResponse(String responseBody) =>
+      Account.fromJson(jsonDecode(responseBody));
 
-  final response = await http
-      .post(url, headers: createDefaultHeader(), body: jsonBody)
-      .catchError((err) {
-    print('Error: $err');
-    return Response('', 500, reasonPhrase: 'Client exception: $err');
-  });
+  Future<Account> saveAccount(Account account) async {
+    print(account);
+    var url = Uri.parse('$baseUrl/accounts');
+    print(url);
 
-  if (response.isSuccessful) {
-    print({response.statusCode, '${response.reasonPhrase}', response.body});
-    return compute(parseResponse, response.body);
-  } else {
-    print({response.statusCode, '${response.reasonPhrase}'});
-    throw HttpException(response.statusCode, '${response.reasonPhrase}');
+    var jsonBody = jsonEncode(account);
+    print(jsonBody);
+
+    final response = await http
+        .post(url, headers: _createDefaultHeader(), body: jsonBody)
+        .catchError((err) {
+      print('Error: $err');
+      return Response('', 500, reasonPhrase: 'Client exception: $err');
+    });
+
+    if (response.isSuccessful) {
+      print({response.statusCode, '${response.reasonPhrase}', response.body});
+      return compute(_parseResponse, response.body);
+    } else {
+      print({response.statusCode, '${response.reasonPhrase}'});
+      throw HttpException(response.statusCode, '${response.reasonPhrase}');
+    }
   }
-}
 
-Map<String, String> createDefaultHeader(
-    {String authorization = '',
-    String accept = 'application/json',
-    String contentType = 'application/json; charset=UTF-8'}) {
-  return {
-    'Accept': accept,
-    'Content-Type': contentType,
-    'Authorization': authorization,
-    'Connection': 'Keep-Alive',
-  };
+  Map<String, String> _createDefaultHeader(
+      {String authorization = '',
+      String accept = 'application/json',
+      String contentType = 'application/json; charset=UTF-8'}) {
+    return {
+      'Accept': accept,
+      'Content-Type': contentType,
+      'Authorization': authorization,
+      'Connection': 'Keep-Alive',
+    };
+  }
 }

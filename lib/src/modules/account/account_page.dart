@@ -1,13 +1,15 @@
-import 'package:benchmark_flutter_app/home_page.dart';
 import 'package:benchmark_flutter_app/src/commons/config_storage.dart';
 import 'package:benchmark_flutter_app/src/modules/account/account_client.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
 import 'package:benchmark_flutter_app/src/modules/model/account.dart';
+import 'package:benchmark_flutter_app/src/modules/model/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AccountPage extends StatelessWidget {
-  const AccountPage({super.key});
+  const AccountPage({super.key, required this.config});
+
+  final Config config;
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +23,17 @@ class AccountPage extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         padding: const EdgeInsets.only(top: 10, right: 30, left: 30),
-        child: const SingleChildScrollView(child: AccountForm()),
+        child: SingleChildScrollView(
+            child: AccountForm(baseUrl: config.serverUrl)),
       ),
     );
   }
 }
 
 class AccountForm extends StatefulWidget {
-  const AccountForm({super.key});
+  const AccountForm({super.key, required this.baseUrl});
+
+  final String baseUrl;
 
   @override
   State<AccountForm> createState() => _AccountFormState();
@@ -50,9 +55,43 @@ class _AccountFormState extends State<AccountForm> {
   final ConfigStorage _configStorage = ConfigStorage();
   bool active = false;
   bool notifications = false;
+  late Function(BuildContext) btnPressed;
 
   @override
   void initState() {
+    setState(() {
+      _firstNameController.text = 'Marcelo';
+      _lastNameController.text = 'Vasconcelos';
+      _phoneNumberController.text = '44900880099';
+      selectedCode = CountryCodeEntry.brazil;
+      _emailController.text = 'marvas@alunos.utfpr.edu.br';
+      active = true;
+      _usernameController.text = 'greenbenchmark';
+      _passwordController.text = 'greenbenchmark';
+
+      btnPressed = (ctx) {
+        _futureResponse =
+            AccountClient(baseUrl: widget.baseUrl).saveAccount(Account(
+          null,
+          firstName: _firstNameController.text,
+          lastName: _lastNameController.text,
+          phoneNumber: _phoneNumberController.text,
+          phoneCountryCode: selectedCode!.code,
+          email: _emailController.text,
+          active: false,
+          notification: false,
+          username: _usernameController.text,
+          password: _passwordController.text,
+        ));
+
+        _showSuccessMessage();
+        Future.delayed(
+            const Duration(seconds: 2), () => Navigator.pop(context));
+      };
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
+
     super.initState();
   }
 
@@ -247,32 +286,7 @@ class _AccountFormState extends State<AccountForm> {
                   return SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: !formValid
-                          ? null
-                          : () {
-                              _futureResponse = saveAccount(Account(
-                                null,
-                                firstName: _firstNameController.text,
-                                lastName: _lastNameController.text,
-                                phoneNumber: _phoneNumberController.text,
-                                phoneCountryCode: selectedCode!.code,
-                                email: _emailController.text,
-                                active: false,
-                                notification: false,
-                                username: _usernameController.text,
-                                password: _passwordController.text,
-                              ));
-
-                              // sleep(const Duration(seconds: 2));
-
-                              showSuccessMessage();
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: navigate(context, 1)),
-                              );
-                            },
+                      onPressed: !formValid ? null : btnPressed(context),
                       child: const Text('Save'),
                     ),
                   );
@@ -283,13 +297,13 @@ class _AccountFormState extends State<AccountForm> {
     );
   }
 
-  void showSuccessMessage() async {
+  void _showSuccessMessage() async {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: buildFutureBuilder()),
+      SnackBar(content: _buildFutureBuilder()),
     );
   }
 
-  FutureBuilder<Account> buildFutureBuilder() {
+  FutureBuilder<Account> _buildFutureBuilder() {
     return FutureBuilder<Account>(
       future: _futureResponse,
       builder: (context, snapshot) {
@@ -303,13 +317,6 @@ class _AccountFormState extends State<AccountForm> {
         return const CircularProgressIndicator();
       },
     );
-  }
-
-  WidgetBuilder navigate(BuildContext context, int page) {
-    if (page == 1) {
-      return (context) => const HomePage();
-    }
-    throw Exception('No routes found');
   }
 }
 

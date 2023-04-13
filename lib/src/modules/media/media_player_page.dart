@@ -1,16 +1,17 @@
 import 'dart:io';
 
 import 'package:async/async.dart';
-import 'package:benchmark_flutter_app/home_page.dart';
 import 'package:benchmark_flutter_app/src/commons/file_extensions.dart';
 import 'package:benchmark_flutter_app/src/modules/media/timed_progress_indicator.dart';
-import 'package:external_path/external_path.dart';
+import 'package:benchmark_flutter_app/src/modules/model/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:video_player/video_player.dart';
 
 class MediaPlayerPage extends StatelessWidget {
-  const MediaPlayerPage({super.key});
+  const MediaPlayerPage({super.key, required this.config});
+
+  final Config config;
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +23,17 @@ class MediaPlayerPage extends StatelessWidget {
       body: Container(
         alignment: Alignment.topCenter,
         padding: const EdgeInsets.only(top: 40, right: 20, left: 20),
-        child: const SingleChildScrollView(child: MediaPlayerScreen()),
+        child: SingleChildScrollView(
+            child: MediaPlayerScreen(mediaUri: config.mediaUri)),
       ),
     );
   }
 }
 
 class MediaPlayerScreen extends StatefulWidget {
-  const MediaPlayerScreen({super.key});
+  const MediaPlayerScreen({super.key, required this.mediaUri});
+
+  final String mediaUri;
 
   @override
   State<MediaPlayerScreen> createState() => _MediaPlayerScreenState();
@@ -40,14 +44,10 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> {
   late CancelableOperation _asyncOperation;
   late Future<void> _videoPlayerFuture;
   String fileName = '';
+  late Function(BuildContext) btnPressed;
 
   Future<File> _loadMedia() async {
-    String path = await ExternalPath.getExternalStoragePublicDirectory(
-        ExternalPath.DIRECTORY_MOVIES);
-    Directory dir = Directory(path);
-    String fPath = '${dir.path}/video.mp4';
-    print(fPath);
-    return File(fPath);
+    return File.fromUri(Uri.file(widget.mediaUri));
   }
 
   @override
@@ -55,23 +55,33 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _asyncOperation =
           CancelableOperation.fromFuture(_loadMedia().then((file) {
-            setState(() {
-              if (mounted) {
-                fileName = file.name;
-                _controller = VideoPlayerController.file(file);
-                _controller!.addListener(() {
-                  setState(() {});
-                });
-
-                _videoPlayerFuture =
-                    _controller!.initialize().then((_) => setState(() {}));
-                _controller!.play();
-              }
+        setState(() {
+          if (mounted) {
+            fileName = file.name;
+            _controller = VideoPlayerController.file(file);
+            _controller!.addListener(() {
+              // setState(() {
+              //
+              // });
+              checkVideo();
             });
-          }));
+
+            _videoPlayerFuture =
+                _controller!.initialize().then((_) => setState(() {}));
+            _controller!.play();
+          }
+        });
+      }));
     });
 
     super.initState();
+  }
+
+  void checkVideo(){
+    if(_controller?.value.position == _controller?.value.duration) {
+      _showSuccessMessage();
+      Future.delayed(const Duration(seconds: 2), () => Navigator.pop(context));
+    }
   }
 
   @override
@@ -89,53 +99,47 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> {
         Text(textAlign: TextAlign.left, fileName),
         (_controller != null
             ? FutureBuilder(
-          future: _videoPlayerFuture,
-          builder: (context, snapshot) {
-            return snapshot.connectionState == ConnectionState.done
-                ? Container(
-              padding: const EdgeInsets.only(top: 50),
-              child: AspectRatio(
-                aspectRatio: _controller!.value.aspectRatio,
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: <Widget>[
-                    VideoPlayer(_controller!),
-                    _ControlsOverlay(controller: _controller!),
-                    TimedVideoProgressIndicator(_controller!,
-                        colors: const VideoProgressColors(
-                          playedColor:
-                          Color.fromRGBO(20, 255, 200, 0.7),
-                          bufferedColor:
-                          Color.fromRGBO(0, 225, 225, 0.2),
-                          backgroundColor:
-                          Color.fromRGBO(230, 230, 230, 0.5),
-                        ),
-                        allowScrubbing: true)
-                    // VideoProgressIndicator(_controller!,
-                    //     allowScrubbing: true),
-                  ],
-                ),
-              ),
-            )
-                : Container();
-          },
-        )
+                future: _videoPlayerFuture,
+                builder: (context, snapshot) {
+                  return snapshot.connectionState == ConnectionState.done
+                      ? Container(
+                          padding: const EdgeInsets.only(top: 50),
+                          child: AspectRatio(
+                            aspectRatio: _controller!.value.aspectRatio,
+                            child: Stack(
+                              alignment: Alignment.bottomCenter,
+                              children: <Widget>[
+                                VideoPlayer(_controller!),
+                                _ControlsOverlay(controller: _controller!),
+                                TimedVideoProgressIndicator(_controller!,
+                                    colors: _defaultVideoProgressColors(),
+                                    allowScrubbing: true)
+                                // VideoProgressIndicator(_controller!,
+                                //     allowScrubbing: true),
+                              ],
+                            ),
+                          ),
+                        )
+                      : Container();
+                },
+              )
             : Container()),
       ],
     );
   }
 
-  void showSuccessMessage() async {
+  void _showSuccessMessage() async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Media Executed')),
     );
   }
 
-  WidgetBuilder navigate(BuildContext context, int page) {
-    if (page == 1) {
-      return (context) => const HomePage();
-    }
-    throw Exception('No routes found');
+  VideoProgressColors _defaultVideoProgressColors() {
+    return const VideoProgressColors(
+      playedColor: Color.fromRGBO(20, 255, 200, 0.7),
+      bufferedColor: Color.fromRGBO(0, 225, 225, 0.2),
+      backgroundColor: Color.fromRGBO(230, 230, 230, 0.5),
+    );
   }
 }
 
@@ -154,16 +158,16 @@ class _ControlsOverlay extends StatelessWidget {
           child: controller.value.isPlaying
               ? const SizedBox.shrink()
               : Container(
-            color: Colors.black26,
-            child: const Center(
-              child: Icon(
-                Icons.play_arrow,
-                color: Colors.white,
-                size: 80.0,
-                semanticLabel: 'Play',
-              ),
-            ),
-          ),
+                  color: Colors.black26,
+                  child: const Center(
+                    child: Icon(
+                      Icons.play_arrow,
+                      color: Colors.white,
+                      size: 80.0,
+                      semanticLabel: 'Play',
+                    ),
+                  ),
+                ),
         ),
         GestureDetector(
           onTap: () {
