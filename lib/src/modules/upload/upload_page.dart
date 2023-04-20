@@ -65,9 +65,9 @@ class _UploadFormState extends State<UploadForm> {
         Future.delayed(
             const Duration(seconds: 2), () => Navigator.pop(context));
       };
-    });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
+      WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
+    });
 
     super.initState();
   }

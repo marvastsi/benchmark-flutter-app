@@ -13,16 +13,16 @@ class AccountClient {
 
   final String baseUrl;
 
-  Account _parseResponse(String responseBody) =>
-      Account.fromJson(jsonDecode(responseBody));
+  AccountCreated _parseResponse(String responseBody) =>
+      AccountCreated.fromJson(jsonDecode(responseBody));
 
-  Future<Account> saveAccount(Account account) async {
-    print(account);
+  Future<AccountCreated> saveAccount(Account account) async {
+    print('Client.saveAccount => $account');
     var url = Uri.parse('$baseUrl/accounts');
-    print(url);
+    print('Client.saveAccount -> Url -> $url');
 
     var jsonBody = jsonEncode(account);
-    print(jsonBody);
+    print('Client.saveAccount -> jsonBody => $jsonBody');
 
     final response = await http
         .post(url, headers: _createDefaultHeader(), body: jsonBody)
@@ -32,7 +32,8 @@ class AccountClient {
     });
 
     if (response.isSuccessful) {
-      print({response.statusCode, '${response.reasonPhrase}', response.body});
+      print(
+          'Client.response => ${response.statusCode},  ${response.reasonPhrase}, ${response.body}');
       return compute(_parseResponse, response.body);
     } else {
       print({response.statusCode, '${response.reasonPhrase}'});

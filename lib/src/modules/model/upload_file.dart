@@ -11,4 +11,9 @@ class UploadFile {
   factory UploadFile.fromJson(Map<String, dynamic> json) {
     return UploadFile(name: json['name'], url: json['url']);
   }
+
+  @override
+  String toString() {
+    return toJson().toString();
+  }
 }

@@ -277,9 +277,9 @@ class _FileEntryRow extends StatelessWidget {
             child: TextFormField(
               keyboardType: TextInputType.url,
               validator: (value) {
-                // if (value == null || value.isEmpty) {
-                //   return validationMsg;
-                // }
+                if (value == null || value.isEmpty) {
+                  return validationMsg;
+                }
                 return null;
               },
               decoration: InputDecoration(

@@ -1,3 +1,5 @@
+
+
 class Account {
   final String? id;
   final String firstName;
@@ -41,8 +43,8 @@ class Account {
   factory Account.fromJson(Map<String, dynamic> json) {
     return Account(
       json['id'],
-      firstName: json['firstName'],
-      lastName: json['lastName'],
+      firstName: json['first_name'],
+      lastName: json['last_name'],
       email: json['email'],
       phoneNumber: json['phone_number'],
       phoneCountryCode: json['phone_country_code'],
@@ -51,5 +53,31 @@ class Account {
       username: json['username'],
       password: json['password'],
     );
+  }
+
+  @override
+  String toString() {
+    return toJson().toString();
+  }
+}
+
+class AccountCreated {
+  final String? id;
+
+  AccountCreated(this.id);
+
+  factory AccountCreated.fromJson(Map<String, dynamic> json) {
+    return AccountCreated(
+      json['accountId'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'account_id': id};
+  }
+
+  @override
+  String toString() {
+    return toJson().toString();
   }
 }

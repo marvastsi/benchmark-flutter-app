@@ -1,4 +1,3 @@
-import 'package:benchmark_flutter_app/src/commons/config_storage.dart';
 import 'package:benchmark_flutter_app/src/modules/account/account_client.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
 import 'package:benchmark_flutter_app/src/modules/model/account.dart';
@@ -50,47 +49,53 @@ class _AccountFormState extends State<AccountForm> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  Future<Account>? _futureResponse;
+  Future<AccountCreated>? _futureResponse;
   CountryCodeEntry? selectedCode = CountryCodeEntry.none;
-  final ConfigStorage _configStorage = ConfigStorage();
   bool active = false;
   bool notifications = false;
   late Function(BuildContext) btnPressed;
 
   @override
   void initState() {
+    print('> AccountForm.initState');
     setState(() {
+      print('> AccountForm.initState.setState()');
       _firstNameController.text = 'Marcelo';
       _lastNameController.text = 'Vasconcelos';
       _phoneNumberController.text = '44900880099';
       selectedCode = CountryCodeEntry.brazil;
       _emailController.text = 'marvas@alunos.utfpr.edu.br';
       active = true;
+      notifications = false;
       _usernameController.text = 'greenbenchmark';
       _passwordController.text = 'greenbenchmark';
+      formValidVN.value = true;
 
       btnPressed = (ctx) {
-        _futureResponse =
-            AccountClient(baseUrl: widget.baseUrl).saveAccount(Account(
+        var account = Account(
           null,
           firstName: _firstNameController.text,
           lastName: _lastNameController.text,
           phoneNumber: _phoneNumberController.text,
           phoneCountryCode: selectedCode!.code,
           email: _emailController.text,
-          active: false,
-          notification: false,
+          active: active,
+          notification: notifications,
           username: _usernameController.text,
           password: _passwordController.text,
-        ));
+        );
+
+        _futureResponse =
+            AccountClient(baseUrl: widget.baseUrl).saveAccount(account);
 
         _showSuccessMessage();
+
         Future.delayed(
             const Duration(seconds: 2), () => Navigator.pop(context));
       };
-    });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
+      WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
+    });
 
     super.initState();
   }
@@ -303,8 +308,8 @@ class _AccountFormState extends State<AccountForm> {
     );
   }
 
-  FutureBuilder<Account> _buildFutureBuilder() {
-    return FutureBuilder<Account>(
+  FutureBuilder<AccountCreated> _buildFutureBuilder() {
+    return FutureBuilder<AccountCreated>(
       future: _futureResponse,
       builder: (context, snapshot) {
         if (snapshot.hasData) {

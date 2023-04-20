@@ -36,7 +36,7 @@ class DownloadClient {
         var ios = file.openWrite(mode: FileMode.append);
         ios.add(response.bodyBytes);
         ios.flush();
-        print({response.statusCode, '${response.reasonPhrase}', response.body});
+        print({response.statusCode, '${response.reasonPhrase}'});
         return DownloadFile(file);
       } on Exception catch (ex) {
         print('Error: $ex');

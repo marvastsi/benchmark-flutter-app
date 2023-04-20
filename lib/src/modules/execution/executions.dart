@@ -26,7 +26,9 @@ class TestExecution implements IExecution {
 
   static IExecution getInstance({required Config config}) {
     return _instance ??= TestExecution(
-        config: config, executions: RandomList().create(config.testLoad));
+        config: config,
+        executions:
+            RandomList().create(config.testLoad, config.specificScenario));
   }
 
   @override
@@ -55,12 +57,18 @@ class TestExecution implements IExecution {
 }
 
 class RandomList {
-  List<int> create(int length) {
-    const int first = 1;
-    const int last = 5;
-    var list = List.generate(length, (_) => _rand(first, last));
-    print('>> list: $list');
-    return list;
+  List<int> create(int length, int specificScenario) {
+    if (specificScenario == 0) {
+      const int first = 1;
+      const int last = 5;
+      var list = List.generate(length, (_) => _rand(first, last));
+      print('>> list: $list');
+      return list;
+    } else {
+      var list = List.generate(length, (_) => specificScenario);
+      print('>> list: $list');
+      return list;
+    }
   }
 
   int _rand(int first, int last) {

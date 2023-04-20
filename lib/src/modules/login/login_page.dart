@@ -63,9 +63,9 @@ class _LoginFormState extends State<LoginForm> {
         _showSuccessMessage();
         Future.delayed(const Duration(seconds: 2), () => Navigator.pop(context));
       };
+      WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
 
     super.initState();
   }

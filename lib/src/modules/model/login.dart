@@ -21,6 +21,11 @@ class Credentials {
   factory Credentials.fromJson(Map<String, dynamic> json) {
     return Credentials(username: json['username'], password: json['password']);
   }
+
+  @override
+  String toString() {
+    return toJson().toString();
+  }
 }
 
 class Token {

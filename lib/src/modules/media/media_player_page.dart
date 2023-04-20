@@ -60,10 +60,8 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> {
             fileName = file.name;
             _controller = VideoPlayerController.file(file);
             _controller!.addListener(() {
-              // setState(() {
-              //
-              // });
-              checkVideo();
+              setState(() {});
+              checkVideo(context);
             });
 
             _videoPlayerFuture =
@@ -77,10 +75,11 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> {
     super.initState();
   }
 
-  void checkVideo(){
-    if(_controller?.value.position == _controller?.value.duration) {
+  void checkVideo(BuildContext ctx) {
+    if (!_controller!.value.isPlaying &&
+        _controller?.value.position == _controller?.value.duration) {
       _showSuccessMessage();
-      Future.delayed(const Duration(seconds: 2), () => Navigator.pop(context));
+      Future.delayed(const Duration(seconds: 2), () => Navigator.pop(ctx));
     }
   }
 
