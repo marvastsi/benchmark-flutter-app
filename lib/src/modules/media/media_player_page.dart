@@ -60,7 +60,6 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> {
             fileName = file.name;
             _controller = VideoPlayerController.file(file);
             _controller!.addListener(() {
-              setState(() {});
               checkVideo(context);
             });
 
@@ -79,14 +78,18 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> {
     if (!_controller!.value.isPlaying &&
         _controller?.value.position == _controller?.value.duration) {
       _showSuccessMessage();
-      Future.delayed(const Duration(seconds: 2), () => Navigator.pop(ctx));
+      print('MediaPlayerScreen.checkVideo');
+      _asyncOperation.cancel();
+      _controller?.dispose();
+      Future.delayed(
+          const Duration(seconds: 1), () => Navigator.pop(context));
     }
   }
 
   @override
   void dispose() {
-    _asyncOperation.cancel();
-    _controller?.dispose();
+    // _asyncOperation.cancel();
+    // _controller?.dispose();
     super.dispose();
   }
 

@@ -72,6 +72,7 @@ class _AppConfigFormState extends State<AppConfigForm> {
 
   @override
   Widget build(BuildContext context) {
+    print('AppConfigForm.build()');
     final List<DropdownMenuEntry<ScenarioEntry>> scenarioEntries =
         <DropdownMenuEntry<ScenarioEntry>>[];
     for (final ScenarioEntry scenario in ScenarioEntry.values) {

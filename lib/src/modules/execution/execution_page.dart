@@ -46,6 +46,7 @@ class _ExecutionFormState extends State<ExecutionForm> {
 
   @override
   void initState() {
+    print('>>> ExecutionForm.initState()');
     refreshData();
     super.initState();
   }
@@ -129,7 +130,7 @@ class _ExecutionFormState extends State<ExecutionForm> {
   void _executeScenario(BuildContext context) {
     print('>>> ExecutionForm._executeScenario()');
     if (testExecution.isRunning()) {
-      Future.delayed(const Duration(seconds: 2), () => _navigate(context));
+      Future.delayed(const Duration(milliseconds: 500), () => _navigate(context));
     }
   }
 
