@@ -49,6 +49,8 @@ class _DownloadFormState extends State<DownloadForm> {
 
   @override
   void initState() {
+    super.initState();
+
     setState(() {
       _fileNameController.text = widget.downloadUri;
 
@@ -59,20 +61,19 @@ class _DownloadFormState extends State<DownloadForm> {
         });
 
         _showSuccessMessage();
+
         Future.delayed(
             const Duration(seconds: 2), () => Navigator.pop(context));
       };
 
       WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
     });
-
-    super.initState();
   }
 
   @override
   void dispose() {
-    _fileNameController.dispose();
     super.dispose();
+    _fileNameController.dispose();
   }
 
   @override

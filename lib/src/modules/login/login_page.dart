@@ -47,6 +47,8 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   void initState() {
+    super.initState();
+
     setState(() {
       _usernameController.text = 'greenbenchmark';
       _passwordController.text = 'greenbenchmark';
@@ -59,22 +61,21 @@ class _LoginFormState extends State<LoginForm> {
                   password: _passwordController.text));
         });
 
-        // sleep(const Duration(seconds: 2));
         _showSuccessMessage();
-        Future.delayed(const Duration(seconds: 2), () => Navigator.pop(context));
+
+        Future.delayed(
+            const Duration(seconds: 2), () => Navigator.pop(context));
       };
+
       WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
     });
-
-
-    super.initState();
   }
 
   @override
   void dispose() {
+    super.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
-    super.dispose();
   }
 
   @override

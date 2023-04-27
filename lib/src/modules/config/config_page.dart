@@ -55,8 +55,8 @@ class _AppConfigFormState extends State<AppConfigForm> {
 
   @override
   void initState() {
-    requestPermission();
     super.initState();
+    requestPermission();
   }
 
   @override

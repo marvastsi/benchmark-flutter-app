@@ -51,6 +51,8 @@ class _UploadFormState extends State<UploadForm> {
 
   @override
   void initState() {
+    super.initState();
+
     setState(() {
       var file = File.fromUri(Uri.file(widget.uploadUri));
       _filePathController.text = file.name;
@@ -62,20 +64,19 @@ class _UploadFormState extends State<UploadForm> {
         });
 
         _showSuccessMessage();
+
         Future.delayed(
             const Duration(seconds: 2), () => Navigator.pop(context));
       };
 
       WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
     });
-
-    super.initState();
   }
 
   @override
   void dispose() {
-    _filePathController.dispose();
     super.dispose();
+    _filePathController.dispose();
   }
 
   @override

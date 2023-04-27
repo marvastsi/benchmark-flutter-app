@@ -46,14 +46,12 @@ class _ExecutionFormState extends State<ExecutionForm> {
 
   @override
   void initState() {
-    print('>>> ExecutionForm.initState()');
-    refreshData();
     super.initState();
+    refreshData();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('> ExecutionForm.build');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -82,18 +80,13 @@ class _ExecutionFormState extends State<ExecutionForm> {
   }
 
   void refreshData() {
-    print('> ExecutionForm.refreshData');
     ConfigStorage().getConfig().then((config) {
-      print('> ExecutionForm.refreshData.getConfig');
       setState(() {
-        print('> ExecutionForm.refreshData.getConfig.setState');
         _config = config;
         testExecution = TestExecution.getInstance(config: _config);
 
         if (testExecution.hasNext()) {
-          print('> ExecutionForm.refreshData.if=>testExecution.hasNext');
           _scenario = testExecution.next();
-          print('> ExecutionForm.refreshData._scenario => $_scenario');
           if (testExecution.isRunning()) {
             _textLabel = 'Test Execution is Running';
           }
@@ -110,11 +103,9 @@ class _ExecutionFormState extends State<ExecutionForm> {
           _scenario = 0;
           testExecution.stop();
           btnPressed = (ctx) {
-            print('>>> ExecutionForm.btnPressed-reconfigure($_scenario, ${testExecution.isRunning()})');
             _navigate(ctx);
           };
         }
-        print('>>> ExecutionForm.btnPressed($_scenario, ${testExecution.isRunning()})');
         WidgetsBinding.instance
             .addPostFrameCallback((_) => _executeScenario(context));
       });
@@ -122,33 +113,23 @@ class _ExecutionFormState extends State<ExecutionForm> {
   }
 
   void _onGoBack(dynamic value) {
-    print('>>> ExecutionForm._onGoBack()');
     refreshData();
     setState(() {});
   }
 
   void _executeScenario(BuildContext context) {
-    print('>>> ExecutionForm._executeScenario()');
     if (testExecution.isRunning()) {
-      Future.delayed(const Duration(milliseconds: 500), () => _navigate(context));
+      Future.delayed(
+          const Duration(milliseconds: 500), () => _navigate(context));
     }
   }
 
-  // void _navigate(BuildContext context) {
-  //   print('>>> ExecutionForm._navigate()');
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: _getPageRoute(context, _scenario)),
-  //   ).then((_) => setState(() {}));
-  // }
   void _navigate(BuildContext context) {
-    print('>>> ExecutionForm._navigate()');
     Route route = MaterialPageRoute(builder: _getPageRoute(context, _scenario));
     Navigator.push(context, route).then(_onGoBack);
   }
 
   WidgetBuilder _getPageRoute(BuildContext context, int page) {
-    print('> ExecutionForm._getPageRoute(page => $page)');
     switch (page) {
       case 0:
         return (context) => const AppConfigPage();

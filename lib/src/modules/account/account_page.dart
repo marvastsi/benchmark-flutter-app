@@ -57,6 +57,8 @@ class _AccountFormState extends State<AccountForm> {
 
   @override
   void initState() {
+    super.initState();
+
     print('> AccountForm.initState');
     setState(() {
       print('> AccountForm.initState.setState()');
@@ -72,21 +74,23 @@ class _AccountFormState extends State<AccountForm> {
       formValidVN.value = true;
 
       btnPressed = (ctx) {
-        var account = Account(
-          null,
-          firstName: _firstNameController.text,
-          lastName: _lastNameController.text,
-          phoneNumber: _phoneNumberController.text,
-          phoneCountryCode: selectedCode!.code,
-          email: _emailController.text,
-          active: active,
-          notification: notifications,
-          username: _usernameController.text,
-          password: _passwordController.text,
-        );
+        setState(() {
+          var account = Account(
+            null,
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            phoneNumber: _phoneNumberController.text,
+            phoneCountryCode: selectedCode!.code,
+            email: _emailController.text,
+            active: active,
+            notification: notifications,
+            username: _usernameController.text,
+            password: _passwordController.text,
+          );
 
-        _futureResponse =
-            AccountClient(baseUrl: widget.baseUrl).saveAccount(account);
+          _futureResponse =
+              AccountClient(baseUrl: widget.baseUrl).saveAccount(account);
+        });
 
         _showSuccessMessage();
 
@@ -96,12 +100,11 @@ class _AccountFormState extends State<AccountForm> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) => btnPressed(context));
     });
-
-    super.initState();
   }
 
   @override
   void dispose() {
+    super.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
     _phoneNumberController.dispose();
@@ -109,7 +112,6 @@ class _AccountFormState extends State<AccountForm> {
     _emailController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
-    super.dispose();
   }
 
   @override
@@ -291,7 +293,11 @@ class _AccountFormState extends State<AccountForm> {
                   return SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: !formValid ? null : btnPressed(context),
+                      onPressed: !formValid
+                          ? null
+                          : () {
+                              btnPressed(context);
+                            },
                       child: const Text('Save'),
                     ),
                   );
@@ -302,7 +308,7 @@ class _AccountFormState extends State<AccountForm> {
     );
   }
 
-  void _showSuccessMessage() async {
+  void _showSuccessMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: _buildFutureBuilder()),
     );

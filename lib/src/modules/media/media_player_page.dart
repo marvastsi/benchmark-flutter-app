@@ -87,13 +87,6 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> {
   }
 
   @override
-  void dispose() {
-    // _asyncOperation.cancel();
-    // _controller?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
