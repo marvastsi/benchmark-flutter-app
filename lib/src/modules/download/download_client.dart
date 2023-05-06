@@ -14,9 +14,7 @@ class DownloadClient {
   final String baseUrl;
 
   Future<DownloadFile> download({required String fileName}) async {
-    print(fileName);
     var url = Uri.parse('$baseUrl/files/download/$fileName');
-    print(url);
 
     final response =
         await http.get(url, headers: _createDefaultHeader()).catchError((err) {

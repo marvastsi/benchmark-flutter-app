@@ -72,7 +72,6 @@ class _AppConfigFormState extends State<AppConfigForm> {
 
   @override
   Widget build(BuildContext context) {
-    print('AppConfigForm.build()');
     final List<DropdownMenuEntry<ScenarioEntry>> scenarioEntries =
         <DropdownMenuEntry<ScenarioEntry>>[];
     for (final ScenarioEntry scenario in ScenarioEntry.values) {
@@ -217,12 +216,12 @@ class _AppConfigFormState extends State<AppConfigForm> {
                                   _downloadFileController.text,
                                   _serverUrlController.text,
                                   selectedScenario!.scenario);
-                              print(config);
                               _configStorage.saveConfig(config);
 
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('App config saved')),
+                                SnackBar(
+                                    content: Text(
+                                        'Config saved: ${config.serverUrl}')),
                               );
 
                               Navigator.push(
@@ -316,11 +315,11 @@ class _FileEntryRow extends StatelessWidget {
 
 enum ScenarioEntry {
   none(0, 'Select a scenario'),
-  login(1, 'Login API'),
-  account(2, 'Account Form'),
-  download(3, 'Download File'),
-  upload(4, 'Upload File'),
-  media(5, 'Media Execution');
+  login(1, '1 - Login API'),
+  account(2, '2 - Account Form'),
+  download(3, '3 - Download File'),
+  upload(4, '4 - Upload File'),
+  media(5, '5 - Media Execution');
 
   const ScenarioEntry(this.scenario, this.label);
 

@@ -94,7 +94,7 @@ class _UploadFormState extends State<UploadForm> {
             child: TextFormField(
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Not a valid username';
+                  return 'Not a valid file';
                 }
                 return null;
               },
@@ -135,10 +135,10 @@ class _UploadFormState extends State<UploadForm> {
       future: _futureResponse,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Text('${snapshot.data}');
+          return Text('Upload executed ${snapshot.data?.name}');
         } else if (snapshot.hasError) {
           HttpException error = snapshot.error! as HttpException;
-          return Text('${error.code}: ${error.message}');
+          return Text('${error.code}: Upload failed');
         }
 
         return const CircularProgressIndicator();

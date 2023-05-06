@@ -78,7 +78,6 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> {
     if (!_controller!.value.isPlaying &&
         _controller?.value.position == _controller?.value.duration) {
       _showSuccessMessage();
-      print('MediaPlayerScreen.checkVideo');
       _asyncOperation.cancel();
       _controller?.dispose();
       Future.delayed(

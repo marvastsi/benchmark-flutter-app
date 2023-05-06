@@ -91,7 +91,7 @@ class _DownloadFormState extends State<DownloadForm> {
             child: TextFormField(
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Not a valid username';
+                  return 'Not a valid file';
                 }
                 return null;
               },
@@ -132,15 +132,14 @@ class _DownloadFormState extends State<DownloadForm> {
       future: _futureResponse,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Text('${snapshot.data}');
+          return Text('Download Executed: ${snapshot.data?.file}');
         } else if (snapshot.hasError) {
           Exception error = snapshot.error! as Exception;
-          var str = 'error: ${error.toString()}';
+          var message = 'Download failed';
           if (error is HttpException) {
-            var str = '${error.code}: ${error.message}';
-            return Text(str);
+            message = '${error.code}: $message';
           }
-          return Text(str);
+          return Text(message);
         }
 
         return const CircularProgressIndicator();

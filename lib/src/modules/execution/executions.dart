@@ -62,11 +62,9 @@ class RandomList {
       const int first = 1;
       const int last = 5;
       var list = List.generate(length, (_) => _rand(first, last));
-      print('>> list: $list');
       return list;
     } else {
       var list = List.generate(length, (_) => specificScenario);
-      print('>> list: $list');
       return list;
     }
   }

@@ -19,7 +19,6 @@ class UploadClient {
 
   Future<UploadFile> upload({required File file}) async {
     var uri = Uri.parse('$baseUrl/files/upload');
-    print(uri);
     var request = http.MultipartRequest('POST', uri)
       ..files.add(http.MultipartFile.fromBytes(
         'file',

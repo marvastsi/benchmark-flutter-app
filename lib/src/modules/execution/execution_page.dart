@@ -43,6 +43,7 @@ class _ExecutionFormState extends State<ExecutionForm> {
   late IExecution testExecution;
   late Function(BuildContext) btnPressed;
   late Config _config;
+  bool _visible = true;
 
   @override
   void initState() {
@@ -67,11 +68,14 @@ class _ExecutionFormState extends State<ExecutionForm> {
         ),
         Center(
           child: SizedBox(
-            child: ElevatedButton(
-              onPressed: () {
-                btnPressed(context);
-              },
-              child: Text(_textButton),
+            child: Visibility(
+              visible: _visible,
+              child: ElevatedButton(
+                onPressed: () {
+                  btnPressed(context);
+                },
+                child: Text(_textButton),
+              ),
             ),
           ),
         ),
@@ -105,6 +109,7 @@ class _ExecutionFormState extends State<ExecutionForm> {
           btnPressed = (ctx) {
             _navigate(ctx);
           };
+          _visible = false;
         }
         WidgetsBinding.instance
             .addPostFrameCallback((_) => _executeScenario(context));
@@ -119,8 +124,7 @@ class _ExecutionFormState extends State<ExecutionForm> {
 
   void _executeScenario(BuildContext context) {
     if (testExecution.isRunning()) {
-      Future.delayed(
-          const Duration(milliseconds: 500), () => _navigate(context));
+      _navigate(context);
     }
   }
 

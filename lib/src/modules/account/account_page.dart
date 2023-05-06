@@ -1,3 +1,4 @@
+import 'package:benchmark_flutter_app/src/commons/string_extensions.dart';
 import 'package:benchmark_flutter_app/src/modules/account/account_client.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
 import 'package:benchmark_flutter_app/src/modules/model/account.dart';
@@ -59,9 +60,7 @@ class _AccountFormState extends State<AccountForm> {
   void initState() {
     super.initState();
 
-    print('> AccountForm.initState');
     setState(() {
-      print('> AccountForm.initState.setState()');
       _firstNameController.text = 'Marcelo';
       _lastNameController.text = 'Vasconcelos';
       _phoneNumberController.text = '44900880099';
@@ -164,7 +163,7 @@ class _AccountFormState extends State<AccountForm> {
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: TextFormField(
               validator: (value) {
-                if (value == null || value.isEmpty) {
+                if (value == null || value.isEmpty || value.isValidEmail()) {
                   return 'Not a valid Email';
                 }
                 return null;
@@ -191,9 +190,9 @@ class _AccountFormState extends State<AccountForm> {
                     initialSelection: CountryCodeEntry.none,
                     controller: _phoneCountryCodeController,
                     dropdownMenuEntries: scenarioEntries,
-                    onSelected: (CountryCodeEntry? scenario) {
+                    onSelected: (CountryCodeEntry? code) {
                       setState(() {
-                        selectedCode = scenario;
+                        selectedCode = code;
                       });
                     },
                   ),
@@ -227,7 +226,6 @@ class _AccountFormState extends State<AccountForm> {
               children: <Widget>[
                 const Expanded(flex: 0, child: Text('Active')),
                 Switch(
-                  //switch at right side of label
                   value: active,
                   onChanged: (bool value) {
                     setState(() {
@@ -256,7 +254,7 @@ class _AccountFormState extends State<AccountForm> {
             child: TextFormField(
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Username is required';
+                  return 'Not a valid username';
                 }
                 return null;
               },
@@ -272,8 +270,8 @@ class _AccountFormState extends State<AccountForm> {
             child: TextFormField(
               keyboardType: TextInputType.url,
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Password is required';
+                if (value == null || value.isEmpty || int.parse(value) <= 5) {
+                  return 'Password must be >5 characters';
                 }
                 return null;
               },
@@ -319,10 +317,10 @@ class _AccountFormState extends State<AccountForm> {
       future: _futureResponse,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Text('${snapshot.data}');
+          return Text('Account created with id: ${snapshot.data?.id}');
         } else if (snapshot.hasError) {
           HttpException error = snapshot.error! as HttpException;
-          return Text('${error.code}: ${error.message}');
+          return Text('${error.code}: Account create failed');
         }
 
         return const CircularProgressIndicator();

@@ -93,7 +93,7 @@ class _LoginFormState extends State<LoginForm> {
             child: TextFormField(
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Not a valid username';
+                  return 'Username is required';
                 }
                 return null;
               },
@@ -151,10 +151,10 @@ class _LoginFormState extends State<LoginForm> {
       future: _futureResponse,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Text('${snapshot.data}');
+          return Text('Welcome ${_usernameController.text}');
         } else if (snapshot.hasError) {
           HttpException error = snapshot.error! as HttpException;
-          return Text('${error.code}: ${error.message}');
+          return Text('${error.code}: Login failed');
         }
 
         return const CircularProgressIndicator();
