@@ -1,4 +1,5 @@
 import 'package:benchmark_flutter_app/src/commons/config_storage.dart';
+import 'package:benchmark_flutter_app/src/commons/custom_app_bar.dart';
 import 'package:benchmark_flutter_app/src/modules/account/account_page.dart';
 import 'package:benchmark_flutter_app/src/modules/config/config_page.dart';
 import 'package:benchmark_flutter_app/src/modules/download/download_page.dart';
@@ -17,6 +18,7 @@ class ExecutionPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Green Benchmark'),
+        actions: appBarActions(context),
       ),
       body: Container(
         alignment: Alignment.topCenter,

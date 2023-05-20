@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:benchmark_flutter_app/src/commons/custom_app_bar.dart';
 import 'package:benchmark_flutter_app/src/commons/file_extensions.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
 import 'package:benchmark_flutter_app/src/modules/model/config.dart';
@@ -18,6 +19,7 @@ class UploadPage extends StatelessWidget {
       key: const ValueKey<String>('upload_page'),
       appBar: AppBar(
         title: const Text('Upload'),
+        actions: appBarActions(context),
       ),
       body: Container(
         alignment: Alignment.topCenter,

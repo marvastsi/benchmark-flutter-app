@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:async/async.dart';
+import 'package:benchmark_flutter_app/src/commons/custom_app_bar.dart';
 import 'package:benchmark_flutter_app/src/commons/file_extensions.dart';
 import 'package:benchmark_flutter_app/src/modules/media/timed_progress_indicator.dart';
 import 'package:benchmark_flutter_app/src/modules/model/config.dart';
@@ -19,6 +20,7 @@ class MediaPlayerPage extends StatelessWidget {
       key: const ValueKey<String>('media_page'),
       appBar: AppBar(
         title: const Text('Media'),
+        actions: appBarActions(context),
       ),
       body: Container(
         alignment: Alignment.topCenter,

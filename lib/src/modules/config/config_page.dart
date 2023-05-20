@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:benchmark_flutter_app/src/commons/config_storage.dart';
+import 'package:benchmark_flutter_app/src/commons/custom_app_bar.dart';
 import 'package:benchmark_flutter_app/src/commons/file_extensions.dart';
 import 'package:benchmark_flutter_app/src/commons/permissions.dart';
 import 'package:benchmark_flutter_app/src/modules/execution/execution_page.dart';
@@ -19,6 +20,7 @@ class AppConfigPage extends StatelessWidget {
       key: const ValueKey<String>('config_page'),
       appBar: AppBar(
         title: const Text('App Config'),
+        actions: appBarActions(context),
       ),
       body: Container(
         alignment: Alignment.topCenter,

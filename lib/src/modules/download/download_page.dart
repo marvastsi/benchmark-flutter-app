@@ -1,3 +1,4 @@
+import 'package:benchmark_flutter_app/src/commons/custom_app_bar.dart';
 import 'package:benchmark_flutter_app/src/modules/download/download_client.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
 import 'package:benchmark_flutter_app/src/modules/model/config.dart';
@@ -15,6 +16,7 @@ class DownloadPage extends StatelessWidget {
       key: const ValueKey<String>('download_page'),
       appBar: AppBar(
         title: const Text('Download'),
+        actions: appBarActions(context),
       ),
       body: Container(
         alignment: Alignment.topCenter,

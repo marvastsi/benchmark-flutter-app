@@ -1,3 +1,4 @@
+import 'package:benchmark_flutter_app/src/commons/custom_app_bar.dart';
 import 'package:benchmark_flutter_app/src/commons/string_extensions.dart';
 import 'package:benchmark_flutter_app/src/modules/account/account_client.dart';
 import 'package:benchmark_flutter_app/src/modules/http/http_exception.dart';
@@ -17,6 +18,7 @@ class AccountPage extends StatelessWidget {
       key: const ValueKey<String>('account_page'),
       appBar: AppBar(
         title: const Text('Account'),
+        actions: appBarActions(context),
       ),
       body: Container(
         alignment: Alignment.topCenter,
