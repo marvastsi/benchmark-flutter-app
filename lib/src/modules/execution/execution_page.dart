@@ -39,6 +39,8 @@ class ExecutionForm extends StatefulWidget {
 }
 
 class _ExecutionFormState extends State<ExecutionForm> {
+  late int _startTimestamp = 0;
+  late int _stopTimestamp = 0;
   late int _scenario;
   String _textLabel = 'Click the button to Start';
   String _textButton = 'Start';
@@ -71,6 +73,22 @@ class _ExecutionFormState extends State<ExecutionForm> {
         Center(
           child: SizedBox(
             child: Visibility(
+              visible: !_visible,
+              child: Text('Start: $_startTimestamp'),
+            ),
+          ),
+        ),
+        Center(
+          child: SizedBox(
+            child: Visibility(
+              visible: !_visible,
+              child: Text('Stop: $_stopTimestamp'),
+            ),
+          ),
+        ),
+        Center(
+          child: SizedBox(
+            child: Visibility(
               visible: _visible,
               child: ElevatedButton(
                 onPressed: () {
@@ -98,6 +116,7 @@ class _ExecutionFormState extends State<ExecutionForm> {
           }
           btnPressed = (ctx) {
             if (!testExecution.isRunning()) {
+              _startTimestamp = DateTime.now().millisecondsSinceEpoch;
               testExecution.start();
             }
 
@@ -112,6 +131,7 @@ class _ExecutionFormState extends State<ExecutionForm> {
             _navigate(ctx);
           };
           _visible = false;
+          _stopTimestamp = DateTime.now().millisecondsSinceEpoch;
         }
         WidgetsBinding.instance
             .addPostFrameCallback((_) => _executeScenario(context));
